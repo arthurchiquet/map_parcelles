@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte des parcelles de vignes</title>
+    <!-- Intégration de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900 h-screen">
+    <div class="h-full">
+
+        <!-- Carte -->
+        <div id="map" class="w-full h-full overflow-hidden"></div>
+        <div class="absolute backdrop-blur-md bg-white/30 top-2 left-2 text-right p-4 border rounded-lg font-bold" id="features">
+          <div id="pd">
+            <p id="commune_label">Toucher une commune</p>
+            <p id="ld_label"></p>
+          </div>
+        </div>
+    </div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ0aHVyY2hpcXVldCIsImEiOiJjbHBoaHB6MncwMXNlMmxucDBlYndpaW93In0.Muo3cgXaUJjMC14H9bXfUw';
+
+        const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/arthurchiquet/cm3y9pekf008b01s80kuzadsn',
+                center: [4.0, 49.0],
+                zoom:11
+            });
+
+        let hoveredPolygonId = null;
+        let hoveredLieuxDitsId = null;
+
+        map.on('load', () => {
+          map.addSource('communes', {
+              'type': 'geojson',
+              'data': 'https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/main/communes_aoc.geojson'
+          });
+
+          map.addLayer({
+              'id': 'communes-fills',
+              'type': 'fill',
+              'source': 'communes',
+              'layout': {},
+              'paint': {
+                  'fill-color': [
+                      'case',
+                      ['boolean', ['feature-state', 'hover'], false],
+                      '#15803d',
+                      '#a21caf'
+                  ],
+                  'fill-opacity': [
+                      'case',
+                      ['boolean', ['feature-state', 'hover'], false],
+                      0.6,
+                      0.3
+                  ]
+              }
+          });
+
+          map.addLayer({
+              'id': 'communes-borders',
+              'type': 'line',
+              'source': 'communes',
+              'layout': {},
+              'paint': {
+                  'line-dasharray': [2, 2],
+                  'line-color': 'black',
+                  'line-width': [
+                      'case',
+                      ['boolean', ['feature-state', 'hover'], false],
+                      1,
+                      1
+                  ]
+              }
+          });
+
+
+          map.on('mousemove', 'communes-fills', (e) => {
+
+              if (e.features.length > 0) {
+                  document.getElementById('commune_label').innerHTML = `<h3>${e.features[0].properties.nom}</h3>`
+                  if (hoveredPolygonId !== null) {
+                      map.setFeatureState(
+                          { source: 'communes', id: hoveredPolygonId },
+                          { hover: false }
+                      );
+                  }
+                  hoveredPolygonId = e.features[0].id;
+                  map.setFeatureState(
+                      { source: 'communes', id: hoveredPolygonId },
+                      { hover: true }
+                  );
+              }
+          });
+
+          map.on('mouseleave', 'communes-fills', () => {
+              document.getElementById('commune_label').innerHTML = "Touchez une commune"
+              if (hoveredPolygonId !== null) {
+                  map.setFeatureState(
+                      { source: 'communes', id: hoveredPolygonId },
+                      { hover: false }
+                  );
+              }
+              hoveredPolygonId = null;
+          });
+
+
+          function addSourceAndLayers(map, url) {
+              const sourceId = 'lieux_dits';
+              const fillLayerId = 'ld-fills';
+              const borderLayerId = 'ld-borders';
+
+              // Supprimer la source et les couches existantes, si elles existent
+              if (map.getLayer(fillLayerId)) {
+                  map.removeLayer(fillLayerId);
+              }
+              if (map.getLayer(borderLayerId)) {
+                  map.removeLayer(borderLayerId);
+              }
+              if (map.getSource(sourceId)) {
+                  map.removeSource(sourceId);
+              }
+
+              // Ajouter la nouvelle source GeoJSON
+              map.addSource(sourceId, {
+                  'type': 'geojson',
+                  'data': url
+              });
+
+              // Ajouter une couche pour les remplissages
+              map.addLayer({
+                  'id': fillLayerId,
+                  'type': 'fill',
+                  'source': sourceId,
+                  'layout': {},
+                  'paint': {
+                      'fill-color': '#be185d',
+                      'fill-opacity': [
+                          'case',
+                          ['boolean', ['feature-state', 'hover'], false],
+                          0.6,
+                          0.3
+                      ]
+                  }
+              });
+
+              // Ajouter une couche pour les bordures
+              map.addLayer({
+                  'id': borderLayerId,
+                  'type': 'line',
+                  'source': sourceId,
+                  'layout': {},
+                  'paint': {
+                      'line-color': 'black',
+                      'line-width': [
+                          'case',
+                          ['boolean', ['feature-state', 'hover'], false],
+                          1,
+                          0.3
+                      ]
+                  }
+              });
+
+          }
+
+          function highlightFeatures(map) {
+              const sourceId = 'lieux_dits';
+              const fillLayerId = 'ld-fills';
+              const borderLayerId = 'ld-borders';
+        
+
+              map.on('mousemove', fillLayerId, (e) => {
+                  if (e.features.length > 0) {
+                      document.getElementById('ld_label').innerHTML = `<h3>${e.features[0].properties.nom}</h3>`
+                      if (hoveredLieuxDitsId !== null) {
+                          map.setFeatureState(
+                              { source: sourceId, id: hoveredLieuxDitsId },
+                              { hover: false }
+                          );
+                      }
+
+                      hoveredLieuxDitsId = e.features[0].id;
+                      map.setFeatureState(
+                          { source: sourceId, id: hoveredLieuxDitsId },
+                          { hover: true }
+                      );
+
+                      map.setFeatureState(
+                          { source: 'communes', id: hoveredPolygonId },
+                          { hover: false }
+                      );
+                  }
+              });
+
+              map.on('mouseleave', fillLayerId, () => {
+                  document.getElementById('ld_label').innerHTML = ""
+                  if (hoveredLieuxDitsId !== null) {
+                      map.setFeatureState(
+                          { source: sourceId, id: hoveredLieuxDitsId },
+                          { hover: false }
+                      );
+                  }
+                  hoveredLieuxDitsId = null;
+              });
+          }
+
+          // Gestion du clic sur les communes
+          map.on('click', 'communes-fills', (e) => {
+                const feature = e.features[0];
+                const code = feature.properties.code;
+                const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/main/lieux_dits/${code}.geojson`;
+                map.setFeatureState(
+                    { source: 'communes', id: hoveredPolygonId },
+                    { hover: false }
+                );
+                addSourceAndLayers(map, url)
+                highlightFeatures(map)
+          });
+        });
+    </script>
+  </body>
+</html>
