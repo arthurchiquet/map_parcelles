@@ -221,7 +221,7 @@
                 if (code !== clickedCommune) {
                     document.getElementById('ld_label').innerHTML = ""
                     document.getElementById('commune_clicked').innerHTML = feature.properties.nom
-                    const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/main/lieux_dits/${code}.geojson`;
+                    const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/data/lieux_dits/${code}.geojson`;
                     map.setFeatureState(
                         { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
                         { hover: false }
