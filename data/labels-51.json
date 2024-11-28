@@ -1,0 +1,105 @@
+{
+    "type":"FeatureCollection",
+    "features": [
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Sezanne"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [48.72430409658978, 3.72290788887021]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Reims"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [49.25643947577388, 4.034115971946324]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Epernay"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [49.04368303877588, 3.9570693277446884]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Châlons-en-Champagne"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [48.95714731335298, 4.362747340099023]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Vitry-le-François"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [48.72592623793804, 4.585387841771652]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Sainte-Menehould"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [49.09082767093969, 4.8928710020047115]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Dormans"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [49.074631465391725, 3.6386264453539856]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Blancs-Coteaux"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [48.90504076047745, 4.000327045234854]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Mourmelon-le-Grand"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [49.14075965227087, 4.367244098149096]
+            }
+        },
+        {
+            "type":"Feature",
+            "properties": {
+                "name": "Sommesous"
+            },
+            "geometry": {
+                "type":"Point",
+                "coordinates": [48.73815540620309, 4.1977529300019265]
+            }
+        }
+    ]
+}

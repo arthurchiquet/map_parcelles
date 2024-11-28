@@ -1,0 +1,27 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    3.983336,
+                    49.084189
+                ]
+            },
+            "properties": {
+                "Nom": "test_2",
+                "Adresse": "15 rue bel air, 51160 champillon",
+                "Description": "dfffdfd\n",
+                "Tags": [
+                    "test"
+                ],
+                "T\u00e9l\u00e9phone": "(064) 547-1323",
+                "Type": "Viticulture conventionnelle",
+                "Derni\u00e8re modification": "2024-11-25T16:10:35.000Z",
+                "json_url": "https://api.jsonbin.io/v3/b/6744a128ad19ca34f8d01c31"
+            }
+        }
+    ]
+}
