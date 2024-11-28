@@ -28,16 +28,16 @@
 
         <!-- Carte -->
         <div id="map" class="w-full h-full overflow-hidden"></div>
-        <div class="absolute backdrop-blur-md bg-white/30 top-2 left-2 p-4 border rounded-lg" id="features">
+        <div class="hidden md:block absolute backdrop-blur-md bg-white/30 top-2 left-2 p-2 rounded-lg" id="features">
             <p id="commune_label" class="uppercase font-bold text-md">Toucher une commune</p>
             <p id="ld_label" class="uppercase text-sm"></p>
         </div>
-        <div class="absolute left-1/2 top-2 transform -translate-x-1/2 p-2 text-2xl">
+        <div class="absolute left-1/2 bottom-2 transform -translate-x-1/2 p-2 text-2xl">
             <p id="commune_clicked" class="uppercase border-b-4 border-black"></p>
         </div>
     </div>
     <script>
-       
+        
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ0aHVyY2hpcXVldCIsImEiOiJjbTN6dmswdXgyMmprMmpzZnNrZjM3Zzk0In0.sdaakBs3wnmhJpygxiWv4Q';
 
         const map = new mapboxgl.Map({
