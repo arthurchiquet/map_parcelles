@@ -37,7 +37,7 @@
         </div>
     </div>
     <script>
-        
+       
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ0aHVyY2hpcXVldCIsImEiOiJjbTN6dmswdXgyMmprMmpzZnNrZjM3Zzk0In0.sdaakBs3wnmhJpygxiWv4Q';
 
         const map = new mapboxgl.Map({
@@ -65,6 +65,7 @@
 
         let hoveredPolygonId = null;
         let hoveredLieuxDitsId = null;
+        let clickedCommune = null;
 
         map.on('load', () => {
 
@@ -205,16 +206,19 @@
             map.on('click', 'choropleth-fill', (e) => {
                 const feature = e.features[0];
                 const code = feature.properties.code;
-                document.getElementById('ld_label').innerHTML = ""
-                document.getElementById('commune_clicked').innerHTML = feature.properties.nom
-                const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/main/lieux_dits/${code}.geojson`;
-                map.setFeatureState(
-                    { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
-                    { hover: false }
-                );
-                addSourceAndLayers(map, url)
-                highlightFeatures(map)
-                map.fitBounds(turf.bbox(feature))
+                if (code !== clickedCommune) {
+                    document.getElementById('ld_label').innerHTML = ""
+                    document.getElementById('commune_clicked').innerHTML = feature.properties.nom
+                    const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/main/lieux_dits/${code}.geojson`;
+                    map.setFeatureState(
+                        { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
+                        { hover: false }
+                    );
+                    addSourceAndLayers(map, url)
+                    highlightFeatures(map)
+                    map.fitBounds(turf.bbox(feature))
+                    clickedCommune = code
+                }
             });
         });
     </script>
