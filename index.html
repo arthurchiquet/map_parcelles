@@ -8,9 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+    <script src="https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css" />
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link href='https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.css' rel='stylesheet' />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
@@ -60,12 +62,15 @@
                 positionOptions: {
                     enableHighAccuracy: true
                 },
-                // When active the map will receive updates to the device's location as it changes.
                 trackUserLocation: true,
-                // Draw an arrow next to the location dot to indicate which direction the device is heading.
                 showUserHeading: true
             })
         );
+
+        map.addControl(new MapboxExportControl({
+              Crosshair: true,
+              PrintableArea: true,
+          }), 'top-right');
 
         map.on('mouseenter', 'choropleth-fill', () => {
           map.getCanvas().style.cursor = 'pointer'
@@ -221,7 +226,7 @@
                 if (code !== clickedCommune) {
                     document.getElementById('ld_label').innerHTML = ""
                     document.getElementById('commune_clicked').innerHTML = feature.properties.nom
-                    const url = `https://raw.githubusercontent.com/arthurchiquet/map_parcelles/refs/heads/master/data/lieux_dits/${code}.geojson`;
+                    const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`;
                     map.setFeatureState(
                         { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
                         { hover: false }
