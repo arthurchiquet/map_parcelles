@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte des parcelles de vignes</title>
-    <!-- Intégration de Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
     <script src="https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.js"></script>
@@ -17,29 +15,109 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: "Roboto Mono", monospace;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
+      /* Global styles */
+      body {
+        font-family: "Roboto Mono", monospace;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        background-color: #f3f4f6;
+        color: #111827;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .full-height {
+        height: 100%;
+      }
+
+      .map-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #features {
+        display: none;
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(8px);
+      }
+
+      @media (min-width: 768px) {
+        #features {
+          display: block;
         }
+      }
+
+      #features p {
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      #commune_label {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      #ld_label {
+        font-size: 12px;
+      }
+
+      #listings {
+        position: absolute;
+        z-index: 999;
+        bottom: 2.5rem;
+        left: 0.5rem;
+        background-color: white;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 0.5rem;
+        max-height: 600px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 5px;
+      }
+
+      #listings li {
+        break-inside: avoid;
+        list-style: none;
+        font-size: 9px;
+      }
+
+      #listings li a {
+        text-decoration: none;
+        color: black;
+      }
+
+      #listings li:hover {
+        font-weight: 700;
+        border-bottom: 2px solid #000;
+      }
+
+
+      .mapboxgl-ctrl {
+        position: relative;
+      }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900 h-screen">
-    <div class="h-full">
-
-        <!-- Carte -->
-        <div id="map" class="w-full h-full overflow-hidden"></div>
-        <div class="hidden md:block absolute backdrop-blur-md bg-white/30 top-2 left-2 p-2 rounded-lg" id="features">
-            <p id="commune_label" class="uppercase font-bold text-md">Toucher une commune</p>
-            <p id="ld_label" class="uppercase text-sm"></p>
+<body>
+    <div class="full-height">
+        <div id="map" class="map-container">
+          <ul id="listings">
+          </ul>
         </div>
-        <div class="absolute left-1/2 bottom-2 transform -translate-x-1/2 p-2 text-2xl">
-            <p id="commune_clicked" class="uppercase border-b-4 border-black"></p>
+        <div id="features">
+            <p id="commune_label">Touchez une commune</p>
+            <p id="ld_label"></p>
         </div>
     </div>
     <script>
-       
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ0aHVyY2hpcXVldCIsImEiOiJjbTN6dmswdXgyMmprMmpzZnNrZjM3Zzk0In0.sdaakBs3wnmhJpygxiWv4Q';
 
         const map = new mapboxgl.Map({
@@ -57,20 +135,12 @@
             })
         );
 
-        map.addControl(
-            new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
-                trackUserLocation: true,
-                showUserHeading: true
-            })
-        );
-
         map.addControl(new MapboxExportControl({
               Crosshair: true,
               PrintableArea: true,
           }), 'top-right');
+
+        map.addControl(new mapboxgl.FullscreenControl());
 
         map.on('mouseenter', 'choropleth-fill', () => {
           map.getCanvas().style.cursor = 'pointer'
@@ -80,16 +150,30 @@
         })
 
 
-        let hoveredPolygonId = null;
-        let hoveredLieuxDitsId = null;
+        let hoveredCommune = null;
         let clickedCommune = null;
+        let hoveredFeatureId = null;
+        let highlightedLinkId = null;
+
 
         map.on('load', () => {
+
+            map.addSource('dem', {
+            'type': 'raster-dem',
+                'url': 'mapbox://mapbox.mapbox-terrain-dem-v1'
+              });
+              map.addLayer(
+                {
+                  'id': 'hillshading',
+                  'source': 'dem',
+                  'type': 'hillshade'
+                }
+              );
 
             map.on('mousemove', 'choropleth-fill', (e) => {
 
                 if (e.features.length > 0) {
-                    document.getElementById('commune_label').innerHTML = `<h3>${e.features[0].properties.nom}</h3>`
+                    document.getElementById('commune_label').innerHTML = `${e.features[0].properties.nom}`
                     document.getElementById('ld_label').innerHTML = "Cliquer pour afficher les lieux-dits"
                 }
             });
@@ -100,11 +184,158 @@
             });
 
 
-            function addSourceAndLayers(map, url) {
-                const sourceId = 'lieux_dits';
-                const fillLayerId = 'ld-fills';
-                const borderLayerId = 'ld-borders';
-                const labelLayerId = "ld-labels"
+            function removeData(sourceId) {
+              const listings = document.getElementById('listings');
+              listings.innerHTML = ""
+              const fillLayerId = sourceId + 'fills';
+              const borderLayerId = sourceId + 'borders';
+              const labelLayerId = sourceId + 'labels'
+
+              // Supprimer la source et les couches existantes, si elles existent
+              if (map.getLayer(fillLayerId)) {
+                map.removeLayer(fillLayerId);
+              }
+              if (map.getLayer(borderLayerId)) {
+                map.removeLayer(borderLayerId);
+              }
+              if (map.getLayer(labelLayerId)) {
+                map.removeLayer(labelLayerId);
+              }
+              if (map.getSource(sourceId)) {
+                map.removeSource(sourceId);
+              }
+            }
+
+
+            function addParcelsToMap(data, sourceId) {
+              const fillLayerId = sourceId + 'fills';
+              const borderLayerId = sourceId + 'borders';
+              const labelLayerId = sourceId + 'labels'
+                map.addSource(sourceId, {
+                  'type': 'geojson',
+                  'data': data
+                });
+
+                map.addLayer({
+                  'id': fillLayerId,
+                  'type': 'fill',
+                  'source': sourceId,
+                  'layout': {},
+                  'paint': {
+                    'fill-color': [
+                      'case',
+                      ['boolean', ['feature-state', 'hover'], false],
+                      "#ef4444",
+                      "#14b8a6"
+                    ],
+                    'fill-opacity': 0.8
+                  }
+                });
+
+                map.addLayer({
+                  'id': borderLayerId,
+                  'type': 'line',
+                  'source': sourceId,
+                  'layout': {},
+                  'paint': {
+                    'line-color': 'black',
+                    'line-width': [
+                      'case',
+                      ['boolean', ['feature-state', 'hover'], false],
+                      2,
+                      0.5
+                    ]
+                  }
+                });
+
+                map.addLayer({
+                  id: labelLayerId,
+                  type: 'symbol',
+                  source: sourceId,
+                  layout: {
+                    'text-field': ['get', 'id'],
+                    'text-size': 7,
+                    'text-anchor': 'center',
+                    'text-offset': [0, 1],
+                    'text-font': ['Open Sans Bold']
+                  },
+                  paint: {
+                    'text-color': '#000000',
+                  }
+                });
+
+                map.on('click', fillLayerId, (e) => {
+                  if (highlightedLinkId) {
+                      old_listing = document.getElementById(highlightedLinkId);
+                      old_listing.style.fontWeight = 'none';
+                      old_listing.style.borderBottom = 'none';
+                  }
+                  const id = e.features[0].id;
+                  highlightedLinkId = `listing-${id}`
+                  const listing = document.getElementById(highlightedLinkId);
+                  listing.style.fontWeight = 700;
+                  listing.style.borderBottom = "2px solid #000";
+                });
+            }
+
+            function getFeatures(map, code) {
+              fetch(`https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/commune/${code}.json`)
+                .then(response => {
+                  if (!response.ok) {
+                    removeData("parcels");  // Supprimer d'abord les données
+                    throw new Error(`Erreur HTTP! Statut : ${response.status}`);  // Ensuite, lancer l'exception
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  // Si la réponse est valide, traiter les données
+                  data.features.forEach((producer, i) => {
+                    producer.properties.id = i + 1;
+                  });
+                  removeData("parcels");  // Supprimer les anciennes données
+                  addParcelsToMap(data, "parcels");  // Ajouter les nouvelles données à la carte
+                  buildList(data);  // Construire la liste avec les données
+                })
+                .catch(error => {
+                  // Optionnel : Gérer les erreurs dans le bloc catch
+                  console.error('Une erreur s\'est produite :', error.message);
+                  // Vous pouvez aussi gérer un message utilisateur ou autre action si nécessaire
+                });
+            }
+
+
+            function buildList(data) {
+              for (const feature of data.features) {
+              // for (const feature of data.features) {
+                /* Add a new listing section to the sidebar. */
+                const listing = listings.appendChild(document.createElement('li'));
+                /* Assign a unique `id` to the listing. */
+                listing.id = `listing-${feature.id}`;
+                /* Add the link to the individual listing created above. */
+                const link = listing.appendChild(document.createElement('a'));
+                link.href = '#';
+                link.id = feature.id;
+                link.innerHTML = `${feature.properties.id} - ${feature.properties.nom}`;
+                link.addEventListener('mouseover', function () {
+                    map.setFeatureState(
+                      { source: "parcels", id: link.id },
+                      { hover: true }
+                    );
+                });
+                link.addEventListener('mouseout', function () {
+                    map.setFeatureState(
+                      { source: "parcels", id: link.id },
+                      { hover: false }
+                    );
+                });
+              }
+            }
+
+
+            function addSourceAndLayers(map, url, sourceId, color, opacity) {
+                const fillLayerId = sourceId + 'fills';
+                const borderLayerId = sourceId + 'borders';
+                const labelLayerId = sourceId+ 'labels'
 
                 // Supprimer la source et les couches existantes, si elles existent
                 if (map.getLayer(fillLayerId)) {
@@ -133,12 +364,12 @@
                     'source': sourceId,
                     'layout': {},
                     'paint': {
-                        'fill-color': '#fbbf24',
+                        'fill-color': color,
                         'fill-opacity': [
                             'case',
                             ['boolean', ['feature-state', 'hover'], false],
-                            1,
-                            0.5
+                            0.8,
+                            opacity
                         ]
                     }
                 });
@@ -159,49 +390,45 @@
                         ]
                     }
                 });
-
                 map.addLayer({
                   id: labelLayerId,
                   type: 'symbol',
                   source: sourceId,
                   layout: {
-                      'text-field': ['get', 'nom'],
-                      'text-size': 7,
-                      'text-anchor': 'center',
-                      'text-offset': [0, 1],
-                      'text-font': ['Open Sans Bold Italic']
+                    'text-field': ['get', 'nom'],
+                    'text-size': 7,
+                    'text-anchor': 'center',
+                    'text-offset': [0, 1],
+                    'text-font': ['Open Sans Bold Italic']
                   },
                   paint: {
-                      'text-color': '#000000',
+                    'text-color': '#000000',
                   }
-              });
-
+                });
             }
 
-            function highlightFeatures(map) {
-                const sourceId = 'lieux_dits';
-                const fillLayerId = 'ld-fills';
-                const borderLayerId = 'ld-borders';
-          
+            function highlightFeatures(map, sourceId) {
+                const fillLayerId = sourceId + 'fills';
+                const borderLayerId = sourceId + 'borders';
 
                 map.on('mousemove', fillLayerId, (e) => {
                     if (e.features.length > 0) {
-                        document.getElementById('ld_label').innerHTML = `<h3>${e.features[0].properties.nom}</h3>`
-                        if (hoveredLieuxDitsId !== null) {
+                        document.getElementById('ld_label').innerHTML = `${e.features[0].properties.nom}`
+                        if (hoveredFeatureId !== null) {
                             map.setFeatureState(
-                                { source: sourceId, id: hoveredLieuxDitsId },
+                                { source: sourceId, id: hoveredFeatureId },
                                 { hover: false }
                             );
                         }
 
-                        hoveredLieuxDitsId = e.features[0].id;
+                        hoveredFeatureId = e.features[0].id;
                         map.setFeatureState(
-                            { source: sourceId, id: hoveredLieuxDitsId },
+                            { source: sourceId, id: hoveredFeatureId },
                             { hover: true }
                         );
 
                         map.setFeatureState(
-                            { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
+                            { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredCommune },
                             { hover: false }
                         );
                     }
@@ -209,13 +436,13 @@
 
                 map.on('mouseleave', fillLayerId, () => {
                     document.getElementById('ld_label').innerHTML = ""
-                    if (hoveredLieuxDitsId !== null) {
+                    if (hoveredFeatureId !== null) {
                         map.setFeatureState(
-                            { source: sourceId, id: hoveredLieuxDitsId },
+                            { source: sourceId, id: hoveredFeatureId },
                             { hover: false }
                         );
                     }
-                    hoveredLieuxDitsId = null;
+                    hoveredFeatureId = null;
                 });
             }
 
@@ -225,14 +452,13 @@
                 const code = feature.properties.code;
                 if (code !== clickedCommune) {
                     document.getElementById('ld_label').innerHTML = ""
-                    document.getElementById('commune_clicked').innerHTML = feature.properties.nom
-                    const url = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`;
                     map.setFeatureState(
-                        { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredPolygonId },
+                        { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredCommune },
                         { hover: false }
                     );
-                    addSourceAndLayers(map, url)
-                    highlightFeatures(map)
+                    addSourceAndLayers(map, `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`, "lieux_dits", '#fbbf24', 0.3)
+                    highlightFeatures(map, "lieux_dits")
+                    getFeatures(map, code)
                     map.fitBounds(turf.bbox(feature))
                     clickedCommune = code
                 }
