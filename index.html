@@ -62,9 +62,9 @@
         position: absolute;
         top: 0.5rem;
         left: 0.5rem;
-        padding: 0.5rem;
+        padding: 0.4rem;
         border-radius: 0.5rem;
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(8px);
       }
 
@@ -88,55 +88,159 @@
         font-size: 12px;
       }
 
-      #listings {
+      #legend {
         position: absolute;
         z-index: 999;
-        bottom: 2.5rem;
+        top: 4rem;
         left: 0.5rem;
-        background-color: white;
-        border: 1px solid black;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
         border-radius: 5px;
         padding: 0.5rem;
         max-height: 600px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-gap: 5px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
       }
 
-      #listings li {
-        break-inside: avoid;
-        list-style: none;
+      #legend a {
         font-size: 9px;
-      }
-
-      #listings li a {
+        text-transform: uppercase;
         text-decoration: none;
         color: black;
       }
 
-      #listings li:hover {
+      #legend a:hover{
         font-weight: 700;
-        border-bottom: 2px solid #000;
+        font-size: 11px;
+      }
+
+
+      .legend-key {
+        display: inline-block;
+        border-radius: 20%;
+        border: 0.3px solid;
+        width: 9px;
+        height: 9px;
+        margin-right: 5px;
       }
 
 
       .mapboxgl-ctrl {
         position: relative;
       }
+
+      .open-modal-btn {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.8rem;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+      }
+
+      .open-modal-btn:hover {
+        border: 2px solid white;
+        font-weight: 700;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      /* Modal (arrière-plan) */
+      .modal {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+      }
+
+      /* Contenu du modal */
+      .modal-content {
+          background-color: #ffffff;
+          padding: 1.5rem;
+          border-radius: 10px;
+          text-align: center;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Animation d'apparition */
+      .modal-content {
+          animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+              transform: scale(0.8);
+          }
+          to {
+              opacity: 1;
+              transform: scale(1);
+          }
+      }
+
     </style>
 </head>
 <body>
     <div class="full-height">
         <div id="map" class="map-container">
-          <ul id="listings">
-          </ul>
+          <div id="legend">
+          </div>
         </div>
         <div id="features">
             <p id="commune_label">Touchez une commune</p>
             <p id="ld_label"></p>
         </div>
+        <button id="openModal" class="open-modal-btn hide">Ouvrir la Fenêtre</button>
+        <div id="modal" class="modal">
+          <div class="modal-content">
+            <p>Contenu de la fenêtre modale</p>
+          </div>
+        </div>
     </div>
     <script>
+        function shuffle(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1)); // Index aléatoire entre 0 et i
+            [array[i], array[j]] = [array[j], array[i]]; // Échange des éléments
+          }
+          return array;
+        }
+
+        const colors = shuffle([
+          "#f87171", "#dc2626", "#991b1b",
+          "#fb923c", "#ea580c", "#9a3412",
+          "#fbbf24", "#d97706", "#92400e",
+          "#facc15", "#ca8a04", "#854d0e",
+          "#a3e635", "#65a30d", "#3f6212",
+          "#4ade80", "#16a34a", "#166534",
+          "#34d399", "#059669", "#065f46",
+          "#2dd4bf", "#0d9488", "#115e59",
+          "#22d3ee", "#0891b2", "#155e75",
+          "#38bdf8", "#0284c7", "#075985",
+          "#60a5fa", "#2563eb", "#1e40af",
+          "#818cf8", "#4f46e5", "#3730a3",
+          "#a78bfa", "#7c3aed", "#5b21b6",
+          "#c084fc", "#9333ea", "#6b21a8",
+          "#e879f9", "#c026d3", "#86198f",
+          "#f472b6", "#db2777", "#9d174d",
+          "#fb7185", "#e11d48", "#9f1239"
+        ])
+
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('service-worker.js')
             .then(() => console.log('Service Worker enregistré !'))
@@ -147,7 +251,8 @@
 
         const map = new mapboxgl.Map({
                 container: 'map',
-                style: 'mapbox://styles/arthurchiquet/cm412sd5i005801s6bg98gu2a',
+                style: 'mapbox://styles/arthurchiquet/cm46trh19014m01s86z8n3ycp',
+                // style: 'mapbox://styles/arthurchiquet/cm412sd5i005801s6bg98gu2a',
                 center: [4.0, 49.0],
                 zoom:11
             });
@@ -170,13 +275,26 @@
         map.on('mouseenter', 'choropleth-fill', () => {
           map.getCanvas().style.cursor = 'pointer'
         })
-        map.on('mouseleave', 'choropleth-fill', () => {
-          map.getCanvas().style.cursor = ''
-        })
+
+        const openModalBtn = document.getElementById('openModal');
+        const modal = document.getElementById('modal');
+
+        // Ouvrir le modal
+        openModalBtn.addEventListener('click', () => {
+          modal.style.display = 'flex'; // Affiche le modal
+        });
+
+        // Fermer le modal en cliquant à l'extérieur du contenu
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
 
 
         let hoveredCommune = null;
         let clickedCommune = null;
+        let clickedProducer = null;
         let hoveredFeatureId = null;
         let highlightedLinkId = null;
 
@@ -210,8 +328,8 @@
 
 
             function removeData(sourceId) {
-              const listings = document.getElementById('listings');
-              listings.innerHTML = ""
+              const legend = document.getElementById('legend');
+              legend.innerHTML = ""
               const fillLayerId = sourceId + 'fills';
               const borderLayerId = sourceId + 'borders';
               const labelLayerId = sourceId + 'labels'
@@ -247,13 +365,13 @@
                   'source': sourceId,
                   'layout': {},
                   'paint': {
-                    'fill-color': [
+                    'fill-color': ['get', 'color'],
+                    'fill-opacity': [
                       'case',
                       ['boolean', ['feature-state', 'hover'], false],
-                      "#ef4444",
-                      "#14b8a6"
-                    ],
-                    'fill-opacity': 0.8
+                      0.8,
+                      0.6
+                    ]
                   }
                 });
 
@@ -267,40 +385,48 @@
                     'line-width': [
                       'case',
                       ['boolean', ['feature-state', 'hover'], false],
-                      2,
+                      1.5,
                       0.5
                     ]
                   }
                 });
 
-                map.addLayer({
-                  id: labelLayerId,
-                  type: 'symbol',
-                  source: sourceId,
-                  layout: {
-                    'text-field': ['get', 'id'],
-                    'text-size': 7,
-                    'text-anchor': 'center',
-                    'text-offset': [0, 1],
-                    'text-font': ['Open Sans Bold']
-                  },
-                  paint: {
-                    'text-color': '#000000',
+                map.on('mouseenter', fillLayerId, (e) => {
+                  const id = e.features[0].id;
+                  highlightedLinkId = id;
+
+                  const link = document.getElementById(highlightedLinkId);
+                  if (link) {
+                    // Appliquer les styles au survol
+                    link.style.fontWeight = '700';
+                    link.style.fontSize = '11px';
+                    map.setFeatureState(
+                      { source: sourceId, id: highlightedLinkId },
+                      { hover: true }
+                    );
+                  }
+                });
+
+                map.on('mouseleave', fillLayerId, (e) => {
+                  const link = document.getElementById(highlightedLinkId);
+                  if (link) {
+                    // Réinitialiser les styles lorsque la souris quitte
+                    link.style.fontWeight = '';  // Réinitialise à l'état d'origine
+                    link.style.fontSize = '';  // Réinitialise à l'état d'origine
+                    map.setFeatureState(
+                      { source: sourceId, id: highlightedLinkId },
+                      { hover: false }
+                    );
                   }
                 });
 
                 map.on('click', fillLayerId, (e) => {
-                  if (highlightedLinkId) {
-                      old_listing = document.getElementById(highlightedLinkId);
-                      old_listing.style.fontWeight = 'none';
-                      old_listing.style.borderBottom = 'none';
-                  }
-                  const id = e.features[0].id;
-                  highlightedLinkId = `listing-${id}`
-                  const listing = document.getElementById(highlightedLinkId);
-                  listing.style.fontWeight = 700;
-                  listing.style.borderBottom = "2px solid #000";
+                  const modalButton = document.getElementById("openModal");
+                  modalButton.classList.remove("hide")
+                  modalButton.innerText = e.features[0].properties.nom
                 });
+
+
             }
 
             function getFeatures(map, code) {
@@ -313,9 +439,9 @@
                   return response.json();
                 })
                 .then(data => {
-                  // Si la réponse est valide, traiter les données
                   data.features.forEach((producer, i) => {
                     producer.properties.id = i + 1;
+                    producer.properties.color = colors[i];
                   });
                   removeData("parcels");  // Supprimer les anciennes données
                   addParcelsToMap(data, "parcels");  // Ajouter les nouvelles données à la carte
@@ -328,19 +454,28 @@
                 });
             }
 
+            function getDetails(feature) {
+
+            }
+
+
 
             function buildList(data) {
               for (const feature of data.features) {
-              // for (const feature of data.features) {
-                /* Add a new listing section to the sidebar. */
-                const listing = listings.appendChild(document.createElement('li'));
-                /* Assign a unique `id` to the listing. */
-                listing.id = `listing-${feature.id}`;
-                /* Add the link to the individual listing created above. */
-                const link = listing.appendChild(document.createElement('a'));
+
+                const link = legend.appendChild(document.createElement('a'));
                 link.href = '#';
                 link.id = feature.id;
-                link.innerHTML = `${feature.properties.id} - ${feature.properties.nom}`;
+
+                const key = document.createElement('span');
+                key.className = 'legend-key';
+                key.style.backgroundColor = feature.properties.color;
+
+                const value = document.createElement('span');
+                value.innerHTML = `${feature.properties.nom}`;
+                link.appendChild(key);
+                link.appendChild(value);
+
                 link.addEventListener('mouseover', function () {
                     map.setFeatureState(
                       { source: "parcels", id: link.id },
@@ -352,6 +487,10 @@
                       { source: "parcels", id: link.id },
                       { hover: false }
                     );
+                });
+
+                link.addEventListener('click', function () {
+                  getDetails(feature)
                 });
               }
             }
@@ -393,7 +532,7 @@
                         'fill-opacity': [
                             'case',
                             ['boolean', ['feature-state', 'hover'], false],
-                            0.8,
+                            0.7,
                             opacity
                         ]
                     }
@@ -471,7 +610,6 @@
                 });
             }
 
-            // Gestion du clic sur les communes
             map.on('click', 'choropleth-fill', (e) => {
                 const feature = e.features[0];
                 const code = feature.properties.code;
@@ -481,7 +619,7 @@
                         { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredCommune },
                         { hover: false }
                     );
-                    addSourceAndLayers(map, `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`, "lieux_dits", '#fbbf24', 0.3)
+                    addSourceAndLayers(map, `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`, "lieux_dits", '#22c55e', 0.2)
                     highlightFeatures(map, "lieux_dits")
                     getFeatures(map, code)
                     map.fitBounds(turf.bbox(feature))
