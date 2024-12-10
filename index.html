@@ -1,632 +1,359 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-    <title>Carte des parcelles de vignes</title>
-    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="images/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css" />
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-    <link href='https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.css' rel='stylesheet' />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
-    <script src="https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-    <style>
-      /* Global styles */
-      body {
-        font-family: "Roboto Mono", monospace;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        background-color: #f3f4f6;
-        color: #111827;
-        height: 100vh;
-        margin: 0;
-        overflow: hidden;
-      }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+  <title>Carte des parcelles de vignes</title>
+  <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-ajax@2.1.0/dist/leaflet.ajax.min.js"
+    integrity="sha256-rVeyUZMfAHhQJ7hvWaHrKknTDdqGcn1gxBBJA++E4z8=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+  <style>
+    /* Global styles */
+    body {
+      font-family: "Roboto Mono", monospace;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
+      background-color: #f3f4f6;
+      color: #111827;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
 
-      .full-height {
-        height: 100%;
-      }
+    #map { height: 100vh; }
 
-      .map-container {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
+    .info {
+      padding: 6px 8px;
+      text-transform: uppercase;
+      font: 16px/18px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
 
-      #features {
-        display: none;
-        position: absolute;
-        top: 0.5rem;
-        left: 0.5rem;
-        padding: 0.4rem;
-        border-radius: 0.5rem;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(8px);
-      }
+    .tooltip {
+      background: none;
+      box-shadow: none;
+      font-weight: 700;
+      border: none;
+      text-transform: uppercase;
+      font-size: 9px;
+    }
 
-      @media (min-width: 768px) {
-        #features {
-          display: block;
-        }
-      }
+    .custom-text-icon {
+      background-color: white;
+    }
 
-      #features p {
-        margin: 0;
-        text-transform: uppercase;
-      }
+    .leaflet-interactive, .leaflet-container {
+    cursor: crosshair !important;
+}
 
-      #commune_label {
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      #ld_label {
-        font-size: 12px;
-      }
-
-      #legend {
-        position: absolute;
-        z-index: 999;
-        top: 4rem;
-        left: 0.5rem;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(8px);
-        border-radius: 5px;
-        padding: 0.5rem;
-        max-height: 600px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-      }
-
-      #legend a {
-        font-size: 9px;
-        text-transform: uppercase;
-        text-decoration: none;
-        color: black;
-      }
-
-      #legend a:hover{
-        font-weight: 700;
-        font-size: 11px;
-      }
-
-
-      .legend-key {
-        display: inline-block;
-        border-radius: 20%;
-        border: 0.3px solid;
-        width: 9px;
-        height: 9px;
-        margin-right: 5px;
-      }
-
-
-      .mapboxgl-ctrl {
-        position: relative;
-      }
-
-      .open-modal-btn {
-        position: absolute;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 0.8rem;
-        cursor: pointer;
-        font-size: 14px;
-        border-radius: 0.5rem;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(8px);
-      }
-
-      .open-modal-btn:hover {
-        border: 2px solid white;
-        font-weight: 700;
-      }
-
-      .hide {
-        display: none;
-      }
-
-      /* Modal (arrière-plan) */
-      .modal {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-
-          z-index: 1000;
-          justify-content: center;
-          align-items: center;
-      }
-
-      /* Contenu du modal */
-      .modal-content {
-          background-color: #ffffff;
-          padding: 1.5rem;
-          border-radius: 10px;
-          text-align: center;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Animation d'apparition */
-      .modal-content {
-          animation: fadeIn 0.3s ease;
-      }
-
-      @keyframes fadeIn {
-          from {
-              opacity: 0;
-              transform: scale(0.8);
-          }
-          to {
-              opacity: 1;
-              transform: scale(1);
-          }
-      }
-
-    </style>
+</style>
 </head>
+
 <body>
-    <div class="full-height">
-        <div id="map" class="map-container">
-          <div id="legend">
-          </div>
-        </div>
-        <div id="features">
-            <p id="commune_label">Touchez une commune</p>
-            <p id="ld_label"></p>
-        </div>
-        <button id="openModal" class="open-modal-btn hide">Ouvrir la Fenêtre</button>
-        <div id="modal" class="modal">
-          <div class="modal-content">
-            <p>Contenu de la fenêtre modale</p>
-          </div>
-        </div>
-    </div>
-    <script>
-        function shuffle(array) {
-          for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1)); // Index aléatoire entre 0 et i
-            [array[i], array[j]] = [array[j], array[i]]; // Échange des éléments
+  <div>
+    <div id="map"></div>
+    <div id="legend"></div>
+  </div>
+  <script>
+    var map = L.map('map', {
+      center: [48.75256718365392, 3.6309814453125004],
+      zoom: 7,
+      zoomControl: false // Désactiver les boutons de zoom
+    });
+    map.getContainer().style.backgroundColor = 'rgba(255, 255, 255, 0)'
+    var corners = [
+      [
+        47.3,
+        1.5
+      ],
+      [
+        50.3,
+        1.5
+      ],
+      [
+        50.3,
+        6.2
+      ],
+      [
+        47.3,
+        6.2
+      ],
+      [
+        47.3,
+        1.5
+      ]
+    ]
+
+    var polygon = L.polygon(corners, {
+      "color": "black",
+      "fillOpacity": 0,
+      "weight": 1,
+    }).addTo(map);
+
+    var textIcon = L.divIcon({
+      className: 'custom-text-icon',
+      html: '<b>LA CHAMPAGNE</b>',
+      iconSize: [100, 0],
+      iconAnchor: [-4, 0]
+    });
+
+    var info = L.control();
+
+    info.onAdd = function (map) {
+      this._div = L.DomUtil.create('div', 'info');
+      this.update();
+      return this._div;
+    };
+
+    info.update = function (properties) {
+      this._div.innerHTML = (properties && properties.nom !== undefined
+        ? `<b>${properties.nom}</b><br />${properties.nomcepage || ''}`
+        : 'Touchez une parcelle');
+    };
+
+
+    info.addTo(map);
+
+    var marker = L.marker([50.3, 1.5], { icon: textIcon }).addTo(map);
+
+    const style1 = { color: "black", weight: 1, fillOpacity: 0 };
+    const style2 = { color: "black", weight: 0.6, fillOpacity: 0 };
+    const style3 = { color: "black", weight: 0.2, fillOpacity: 0 };
+    const style4 = { color: "#db2777", weight: 0.3, fillOpacity: 0.8 };
+    const style5 = { color: "black", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
+
+    const hstyle1 = { weight: 2, fillColor: "#22c55e", fillOpacity: 0.1 };
+    const hstyle2 = { color: "black", weight: 2, fillOpacity: 0.2 };
+    const hstyle3 = { weight: 2, fillOpacity: 1 };
+    const hstyle4 = { weight: 2, fillOpacity: 1 };
+
+    var Layer1 = null;
+    var Layer2 = null;
+    var Layer3 = null;
+    var Layer4 = null;
+    var Layer5 = null;
+
+    function getColor(c) {
+      return c === "MEUNIER N" ? '#8b5cf6' :
+        c === "PINOT NOIR N" ? '#f43f5e' :
+        c === "CHARDONNAY B" ? '#22c55e' :
+        (c) ? '#fbbf24':
+        'white'
+    }
+
+    function getOpacity(c) {
+      return (c) ? 0.8 : 0
+      }
+
+    function styleFeature(feature) {
+        return {
+          fillColor: getColor(feature.properties.nomcepage),
+          weight: 0.4,
+          opacity: 1,
+          color: 'black',
+          fillOpacity: getOpacity(feature.properties.nomcepage)
+        };
+      }
+
+    function createLabel(e) {
+      center = e.target.getBounds().getCenter()
+      labelMarker = L.tooltip({
+        permanent: false,
+        className: 'tooltip',
+        direction: 'center'
+      })
+        .setContent(e.target.feature.properties.nom)
+        .setLatLng(center)
+        .addTo(map);
+
+    }
+
+    function highlightLayer(e, style, layerSource) {
+      var layer = e.target;
+      layer.setStyle(style);
+      createLabel(e);
+
+      if (layerSource === "Layer3") {
+        info.update(layer.feature.properties);
+      }
+    }
+
+    function resetHighlightLayer(e, layerSource) {
+      const layer = e.target;
+      let layerReference = null
+
+      switch (layerSource) {
+        case 'Layer1':
+          layerReference = Layer1;
+          break;
+        case 'Layer2':
+          layerReference = Layer2;
+          break;
+        case 'Layer3':
+          layerReference = Layer3;
+          info.update();
+          break;
+        case 'Layer4':
+          layerReference = Layer4;
+          break;
+        default:
+          layerReference = null;
+      }
+
+      if (layerReference) {
+        layerReference.resetStyle(layer);
+      }
+
+      if (labelMarker) {
+        map.removeLayer(labelMarker);
+      }
+    }
+
+    async function matchParcels(url3, url4, style, onEachFeature) {
+      try {
+        // Récupérer le GeoJSON
+        const geoJsonResponse = await fetch(url3);
+        if (!geoJsonResponse.ok) {
+          throw new Error(`Échec de la récupération du GeoJSON : ${geoJsonResponse.statusText}`);
+        }
+        const geoJson = await geoJsonResponse.json();
+
+        // Récupérer le dictionnaire des propriétés
+        let idDict = {};
+        try {
+          const dictResponse = await fetch(url4);
+          if (dictResponse.ok) {
+            idDict = await dictResponse.json();
+          } else {
+            console.warn(`Échec de la récupération du dictionnaire : ${dictResponse.statusText}`);
           }
-          return array;
+        } catch (dictError) {
+          console.warn("Erreur lors du fetch du dictionnaire :", dictError);
         }
 
-        const colors = shuffle([
-          "#f87171", "#dc2626", "#991b1b",
-          "#fb923c", "#ea580c", "#9a3412",
-          "#fbbf24", "#d97706", "#92400e",
-          "#facc15", "#ca8a04", "#854d0e",
-          "#a3e635", "#65a30d", "#3f6212",
-          "#4ade80", "#16a34a", "#166534",
-          "#34d399", "#059669", "#065f46",
-          "#2dd4bf", "#0d9488", "#115e59",
-          "#22d3ee", "#0891b2", "#155e75",
-          "#38bdf8", "#0284c7", "#075985",
-          "#60a5fa", "#2563eb", "#1e40af",
-          "#818cf8", "#4f46e5", "#3730a3",
-          "#a78bfa", "#7c3aed", "#5b21b6",
-          "#c084fc", "#9333ea", "#6b21a8",
-          "#e879f9", "#c026d3", "#86198f",
-          "#f472b6", "#db2777", "#9d174d",
-          "#fb7185", "#e11d48", "#9f1239"
-        ])
-
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('service-worker.js')
-            .then(() => console.log('Service Worker enregistré !'))
-            .catch(err => console.error('Erreur d\'enregistrement du Service Worker:', err));
-        }
-
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ0aHVyY2hpcXVldCIsImEiOiJjbTN6dmswdXgyMmprMmpzZnNrZjM3Zzk0In0.sdaakBs3wnmhJpygxiWv4Q';
-
-        const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/arthurchiquet/cm46trh19014m01s86z8n3ycp',
-                // style: 'mapbox://styles/arthurchiquet/cm412sd5i005801s6bg98gu2a',
-                center: [4.0, 49.0],
-                zoom:11
-            });
-
-        map.addControl(
-            new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                countries: "fr"
-            })
-        );
-
-        map.addControl(new MapboxExportControl({
-              Crosshair: true,
-              PrintableArea: true,
-          }), 'top-right');
-
-        map.addControl(new mapboxgl.FullscreenControl());
-
-        map.on('mouseenter', 'choropleth-fill', () => {
-          map.getCanvas().style.cursor = 'pointer'
-        })
-
-        const openModalBtn = document.getElementById('openModal');
-        const modal = document.getElementById('modal');
-
-        // Ouvrir le modal
-        openModalBtn.addEventListener('click', () => {
-          modal.style.display = 'flex'; // Affiche le modal
-        });
-
-        // Fermer le modal en cliquant à l'extérieur du contenu
-        modal.addEventListener('click', (event) => {
-          if (event.target === modal) {
-            modal.style.display = 'none';
+        // Appliquer les propriétés au GeoJSON si disponibles
+        turf.featureEach(geoJson, (feature) => {
+          const id = feature.id;
+          if (id && idDict[id]) {
+            feature.properties = { ...feature.properties, ...idDict[id] };
           }
         });
 
+        return L.geoJSON(geoJson, {
+          style: styleFeature,
+          onEachFeature: onEachFeature
+        }).addTo(map);
 
-        let hoveredCommune = null;
-        let clickedCommune = null;
-        let clickedProducer = null;
-        let hoveredFeatureId = null;
-        let highlightedLinkId = null;
-
-
-        map.on('load', () => {
-
-            map.addSource('dem', {
-            'type': 'raster-dem',
-                'url': 'mapbox://mapbox.mapbox-terrain-dem-v1'
-              });
-              map.addLayer(
-                {
-                  'id': 'hillshading',
-                  'source': 'dem',
-                  'type': 'hillshade'
-                }
-              );
-
-            map.on('mousemove', 'choropleth-fill', (e) => {
-
-                if (e.features.length > 0) {
-                    document.getElementById('commune_label').innerHTML = `${e.features[0].properties.nom}`
-                    document.getElementById('ld_label').innerHTML = "Cliquer pour afficher les lieux-dits"
-                }
-            });
-
-            map.on('mouseleave', 'choropleth-fill', () => {
-                document.getElementById('commune_label').innerHTML = "Touchez une commune"
-                document.getElementById('ld_label').innerHTML = ""
-            });
+      } catch (error) {
+        console.error("Erreur lors de la récupération ou du traitement des données :", error);
+      }
+    }
 
 
-            function removeData(sourceId) {
-              const legend = document.getElementById('legend');
-              legend.innerHTML = ""
-              const fillLayerId = sourceId + 'fills';
-              const borderLayerId = sourceId + 'borders';
-              const labelLayerId = sourceId + 'labels'
+    async function clickAction(e, layerSource) {
+      const layer = e.target
 
-              // Supprimer la source et les couches existantes, si elles existent
-              if (map.getLayer(fillLayerId)) {
-                map.removeLayer(fillLayerId);
-              }
-              if (map.getLayer(borderLayerId)) {
-                map.removeLayer(borderLayerId);
-              }
-              if (map.getLayer(labelLayerId)) {
-                map.removeLayer(labelLayerId);
-              }
-              if (map.getSource(sourceId)) {
-                map.removeSource(sourceId);
-              }
-            }
+      switch (layerSource) {
+        case 'Layer1':
+          map.fitBounds(e.target.getBounds());
 
+          if (Layer3) {
+            map.removeLayer(Layer3);
+          }
+          if (Layer4) {
+            map.removeLayer(Layer4);
+          }
+          if (Layer5) {
+            map.removeLayer(Layer5);
+          }
+          if (Layer2) {
+            map.removeLayer(Layer2);
+          }
+          const url2 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/communes/${layer.feature.properties.code}.geojson`;
+          Layer2 = addLayerToMap(url2, style2, (feature, layer) => onEachFeature(feature, layer, hstyle2, "Layer2"));
+          break;
 
-            function addParcelsToMap(data, sourceId) {
-              const fillLayerId = sourceId + 'fills';
-              const borderLayerId = sourceId + 'borders';
-              const labelLayerId = sourceId + 'labels'
-                map.addSource(sourceId, {
-                  'type': 'geojson',
-                  'data': data
-                });
+        case 'Layer2':
+          map.fitBounds(e.target.getBounds());
 
-                map.addLayer({
-                  'id': fillLayerId,
-                  'type': 'fill',
-                  'source': sourceId,
-                  'layout': {},
-                  'paint': {
-                    'fill-color': ['get', 'color'],
-                    'fill-opacity': [
-                      'case',
-                      ['boolean', ['feature-state', 'hover'], false],
-                      0.8,
-                      0.6
-                    ]
-                  }
-                });
+          if (Layer3) {
+            map.removeLayer(Layer3);
+          }
+          if (Layer4) {
+            map.removeLayer(Layer4);
+          }
+          if (Layer5) {
+            map.removeLayer(Layer5);
+          }
+          const url3 = `https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/${layer.feature.properties.id}/geojson/parcelles`;
+          const url4 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/${layer.feature.properties.id}.json`
+          const url5 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/communes/aoc/${layer.feature.properties.id}.geojson`
+          Layer5 = addLayerToMap(url5, style5, (feature, layer) => { }).bringToBack();
+          Layer3 = await matchParcels(url3, url4, style3, (feature, layer) => onEachFeature(feature, layer, hstyle3, "Layer3"))
+          // Layer3 = addLayerToMap(url3, style3, (feature, layer) => onEachFeature(feature, layer, hstyle3, "Layer3"));
+          // Layer4 = addLayerToMap(url4, style4, (feature, layer) => onEachFeature(feature, layer, hstyle4, "Layer4"));
+          break;
 
-                map.addLayer({
-                  'id': borderLayerId,
-                  'type': 'line',
-                  'source': sourceId,
-                  'layout': {},
-                  'paint': {
-                    'line-color': 'black',
-                    'line-width': [
-                      'case',
-                      ['boolean', ['feature-state', 'hover'], false],
-                      1.5,
-                      0.5
-                    ]
-                  }
-                });
+        default:
+          console.log("Layer source non définie");
+          break;
+      }
+    }
 
-                map.on('mouseenter', fillLayerId, (e) => {
-                  const id = e.features[0].id;
-                  highlightedLinkId = id;
+    function onEachFeature(feature, layer, style, layerSource) {
+      layer.on({
+        mouseover: function (e) { highlightLayer(e, style, layerSource); },
+        mouseout: function (e) { resetHighlightLayer(e, layerSource); },
+        click: function (e) { clickAction(e, layerSource); }
+      });
+    }
 
-                  const link = document.getElementById(highlightedLinkId);
-                  if (link) {
-                    // Appliquer les styles au survol
-                    link.style.fontWeight = '700';
-                    link.style.fontSize = '11px';
-                    map.setFeatureState(
-                      { source: sourceId, id: highlightedLinkId },
-                      { hover: true }
-                    );
-                  }
-                });
-
-                map.on('mouseleave', fillLayerId, (e) => {
-                  const link = document.getElementById(highlightedLinkId);
-                  if (link) {
-                    // Réinitialiser les styles lorsque la souris quitte
-                    link.style.fontWeight = '';  // Réinitialise à l'état d'origine
-                    link.style.fontSize = '';  // Réinitialise à l'état d'origine
-                    map.setFeatureState(
-                      { source: sourceId, id: highlightedLinkId },
-                      { hover: false }
-                    );
-                  }
-                });
-
-                map.on('click', fillLayerId, (e) => {
-                  const modalButton = document.getElementById("openModal");
-                  modalButton.classList.remove("hide")
-                  modalButton.innerText = e.features[0].properties.nom
-                });
+    function addLayerToMap(url, style, onEachFeature) {
+      return L.geoJSON.ajax(url, {
+        style: style,
+        onEachFeature: onEachFeature
+      }).addTo(map);
+    }
 
 
-            }
+    Layer1 = L.geoJSON.ajax(`https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/departements.geojson`, {
+      style: style1,
+      onEachFeature: function (feature, layer, style, layerSource) {
+        onEachFeature(feature, layer, hstyle1, "Layer1");
+      }
+    }).addTo(map);
 
-            function getFeatures(map, code) {
-              fetch(`https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/commune/${code}.json`)
-                .then(response => {
-                  if (!response.ok) {
-                    removeData("parcels");  // Supprimer d'abord les données
-                    throw new Error(`Erreur HTTP! Statut : ${response.status}`);  // Ensuite, lancer l'exception
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  data.features.forEach((producer, i) => {
-                    producer.properties.id = i + 1;
-                    producer.properties.color = colors[i];
-                  });
-                  removeData("parcels");  // Supprimer les anciennes données
-                  addParcelsToMap(data, "parcels");  // Ajouter les nouvelles données à la carte
-                  buildList(data);  // Construire la liste avec les données
-                })
-                .catch(error => {
-                  // Optionnel : Gérer les erreurs dans le bloc catch
-                  console.error('Une erreur s\'est produite :', error.message);
-                  // Vous pouvez aussi gérer un message utilisateur ou autre action si nécessaire
-                });
-            }
-
-            function getDetails(feature) {
-
-            }
-
-
-
-            function buildList(data) {
-              for (const feature of data.features) {
-
-                const link = legend.appendChild(document.createElement('a'));
-                link.href = '#';
-                link.id = feature.id;
-
-                const key = document.createElement('span');
-                key.className = 'legend-key';
-                key.style.backgroundColor = feature.properties.color;
-
-                const value = document.createElement('span');
-                value.innerHTML = `${feature.properties.nom}`;
-                link.appendChild(key);
-                link.appendChild(value);
-
-                link.addEventListener('mouseover', function () {
-                    map.setFeatureState(
-                      { source: "parcels", id: link.id },
-                      { hover: true }
-                    );
-                });
-                link.addEventListener('mouseout', function () {
-                    map.setFeatureState(
-                      { source: "parcels", id: link.id },
-                      { hover: false }
-                    );
-                });
-
-                link.addEventListener('click', function () {
-                  getDetails(feature)
-                });
-              }
-            }
-
-
-            function addSourceAndLayers(map, url, sourceId, color, opacity) {
-                const fillLayerId = sourceId + 'fills';
-                const borderLayerId = sourceId + 'borders';
-                const labelLayerId = sourceId+ 'labels'
-
-                // Supprimer la source et les couches existantes, si elles existent
-                if (map.getLayer(fillLayerId)) {
-                    map.removeLayer(fillLayerId);
-                }
-                if (map.getLayer(borderLayerId)) {
-                    map.removeLayer(borderLayerId);
-                }
-                if (map.getLayer(labelLayerId)) {
-                    map.removeLayer(labelLayerId);
-                }
-                if (map.getSource(sourceId)) {
-                    map.removeSource(sourceId);
-                }
-
-                // Ajouter la nouvelle source GeoJSON
-                map.addSource(sourceId, {
-                    'type': 'geojson',
-                    'data': url
-                });
-
-                // Ajouter une couche pour les remplissages
-                map.addLayer({
-                    'id': fillLayerId,
-                    'type': 'fill',
-                    'source': sourceId,
-                    'layout': {},
-                    'paint': {
-                        'fill-color': color,
-                        'fill-opacity': [
-                            'case',
-                            ['boolean', ['feature-state', 'hover'], false],
-                            0.7,
-                            opacity
-                        ]
-                    }
-                });
-
-                // Ajouter une couche pour les bordures
-                map.addLayer({
-                    'id': borderLayerId,
-                    'type': 'line',
-                    'source': sourceId,
-                    'layout': {},
-                    'paint': {
-                        'line-color': 'black',
-                        'line-width': [
-                            'case',
-                            ['boolean', ['feature-state', 'hover'], false],
-                            2,
-                            0.3
-                        ]
-                    }
-                });
-                map.addLayer({
-                  id: labelLayerId,
-                  type: 'symbol',
-                  source: sourceId,
-                  layout: {
-                    'text-field': ['get', 'nom'],
-                    'text-size': 7,
-                    'text-anchor': 'center',
-                    'text-offset': [0, 1],
-                    'text-font': ['Open Sans Bold Italic']
-                  },
-                  paint: {
-                    'text-color': '#000000',
-                  }
-                });
-            }
-
-            function highlightFeatures(map, sourceId) {
-                const fillLayerId = sourceId + 'fills';
-                const borderLayerId = sourceId + 'borders';
-
-                map.on('mousemove', fillLayerId, (e) => {
-                    if (e.features.length > 0) {
-                        document.getElementById('ld_label').innerHTML = `${e.features[0].properties.nom}`
-                        if (hoveredFeatureId !== null) {
-                            map.setFeatureState(
-                                { source: sourceId, id: hoveredFeatureId },
-                                { hover: false }
-                            );
-                        }
-
-                        hoveredFeatureId = e.features[0].id;
-                        map.setFeatureState(
-                            { source: sourceId, id: hoveredFeatureId },
-                            { hover: true }
-                        );
-
-                        map.setFeatureState(
-                            { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredCommune },
-                            { hover: false }
-                        );
-                    }
-                });
-
-                map.on('mouseleave', fillLayerId, () => {
-                    document.getElementById('ld_label').innerHTML = ""
-                    if (hoveredFeatureId !== null) {
-                        map.setFeatureState(
-                            { source: sourceId, id: hoveredFeatureId },
-                            { hover: false }
-                        );
-                    }
-                    hoveredFeatureId = null;
-                });
-            }
-
-            map.on('click', 'choropleth-fill', (e) => {
-                const feature = e.features[0];
-                const code = feature.properties.code;
-                if (code !== clickedCommune) {
-                    document.getElementById('ld_label').innerHTML = ""
-                    map.setFeatureState(
-                        { source: "composite", sourceLayer: "communes_aoc-5l1fop", id: hoveredCommune },
-                        { hover: false }
-                    );
-                    addSourceAndLayers(map, `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/lieux_dits/${code}.geojson`, "lieux_dits", '#22c55e', 0.2)
-                    highlightFeatures(map, "lieux_dits")
-                    getFeatures(map, code)
-                    map.fitBounds(turf.bbox(feature))
-                    clickedCommune = code
-                }
-            });
-        });
-    </script>
-  </body>
-</html>
+  </script>
+</body>
