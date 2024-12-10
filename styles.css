@@ -3,6 +3,19 @@
    height: 100vh;
  }
 
+ #feature {
+  font-family: "Roboto Mono", monospace !important;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 2px solid black;
+  font-size: 18px;
+  position: absolute;
+  z-index: 99;
+  bottom: 1.5em;
+  left: 50%;
+  transform: translate(-50%, -50%);
+ }
+
  .info {
    font-family: "Roboto Mono", monospace !important;
    padding: 5px;

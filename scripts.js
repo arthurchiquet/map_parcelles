@@ -39,6 +39,8 @@ var textIcon = L.divIcon({
 map.fitBounds(corners);
 
 var info = L.control();
+const clickedFeature = document.getElementById("feature")
+console.log(clickedFeature)
 
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info');
@@ -70,7 +72,7 @@ const style3 = { color: "black", weight: 0.2, fillOpacity: 0 };
 const style4 = { color: "#db2777", weight: 0.3, fillOpacity: 0.8 };
 const style5 = { color: "black", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
 
-const hstyle1 = { weight: 2, fillColor: "#22c55e", fillOpacity: 0.1 };
+const hstyle1 = { weight: 2, fillColor: "#22c55e", fillOpacity: 0.1, zoom: 50 };
 const hstyle2 = { color: "black", weight: 2, fillOpacity: 0.2 };
 const hstyle3 = { weight: 2, fillOpacity: 1 };
 const hstyle4 = { weight: 2, fillOpacity: 1 };
@@ -114,6 +116,10 @@ function createLabel(e) {
     .setLatLng(center)
     .addTo(map);
 
+}
+
+function updateFeature(e) {
+  clickedFeature.innerHTML = e.target.feature.properties.nom
 }
 
 function highlightLayer(e, style, layerSource) {
@@ -200,6 +206,7 @@ async function matchParcels(url3, url4, style, onEachFeature) {
 
 async function clickAction(e, layerSource) {
   const layer = e.target
+  updateFeature(e)
 
   switch (layerSource) {
     case 'Layer1':
