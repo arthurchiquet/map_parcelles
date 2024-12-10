@@ -67,26 +67,27 @@ var marker = L.marker([50.3, 1.5], { icon: textIcon }).addTo(map);
 
 const style1 = { color: "black", weight: 1, fillOpacity: 0 };
 const style2 = { color: "black", weight: 0.6, fillOpacity: 0 };
-const style3 = { color: "black", weight: 0.2, fillOpacity: 0 };
-const style4 = { color: "#db2777", weight: 0.3, fillOpacity: 0.8 };
+const style3 = { color: "black", weight: 0.1, fillOpacity: 0 };
+const style4 = { color: "black", fillColor: "#bf9000", weight: 0.2, opacity: 1, fillOpacity: 0.8 };
 const style5 = { color: "black", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
+const style6 = { color: "#075985", weight: 1.5, fillOpacity: 0.5 };
 
 const hstyle1 = { weight: 2, fillColor: "#22c55e", fillOpacity: 0.1, zoom: 50 };
 const hstyle2 = { color: "black", weight: 2, fillOpacity: 0.2 };
-const hstyle3 = { weight: 2, fillOpacity: 1 };
-const hstyle4 = { weight: 2, fillOpacity: 1 };
+const hstyle3 = { weight: 2 };
 
 var Layer1 = null;
 var Layer2 = null;
 var Layer3 = null;
 var Layer4 = null;
 var Layer5 = null;
+var Layer6 = null;
 
 function getColor(c) {
   return c === "MEUNIER N" ? '#8b5cf6' :
     c === "PINOT NOIR N" ? '#f43f5e' :
       c === "CHARDONNAY B" ? '#22c55e' :
-        (c) ? '#fbbf24' :
+        (c) ? '#6fa8dc' :
           'white'
 }
 
@@ -118,7 +119,9 @@ function createLabel(e) {
 }
 
 function updateFeature(e) {
-  clickedFeature.innerHTML = e.target.feature.properties.nom
+  if (e.target.feature.properties.nom) {
+    clickedFeature.innerHTML = e.target.feature.properties.nom
+  }
 }
 
 function highlightLayer(e, style, layerSource) {
@@ -191,7 +194,6 @@ async function matchParcels(url3, url4, style, onEachFeature) {
         feature.properties = { ...feature.properties, ...idDict[id] };
       }
     });
-
     return L.geoJSON(geoJson, {
       style: styleFeature,
       onEachFeature: onEachFeature
@@ -220,6 +222,9 @@ async function clickAction(e, layerSource) {
       if (Layer5) {
         map.removeLayer(Layer5);
       }
+      if (Layer6) {
+        map.removeLayer(Layer6);
+      }
       if (Layer2) {
         map.removeLayer(Layer2);
       }
@@ -239,13 +244,26 @@ async function clickAction(e, layerSource) {
       if (Layer5) {
         map.removeLayer(Layer5);
       }
+      if (Layer6) {
+        map.removeLayer(Layer6);
+      }
       const url3 = `https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/${layer.feature.properties.id}/geojson/parcelles`;
-      const url4 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/${layer.feature.properties.id}.json`
+      const url4 = `https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/${layer.feature.properties.id}/geojson/batiments`;
       const url5 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/communes/aoc/${layer.feature.properties.id}.geojson`
+      const url6 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/${layer.feature.properties.id}.json`
+      const url7 = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/hydrographie-surfaces-deau/records?select=geo_shape&limit=50&refine=code_insee%3A${layer.feature.properties.id}`
+      Layer4 = addLayerToMap(url4, style4, (feature, layer) => { }).bringToBack();
       Layer5 = addLayerToMap(url5, style5, (feature, layer) => { }).bringToBack();
-      Layer3 = await matchParcels(url3, url4, style3, (feature, layer) => onEachFeature(feature, layer, hstyle3, "Layer3"))
-      // Layer3 = addLayerToMap(url3, style3, (feature, layer) => onEachFeature(feature, layer, hstyle3, "Layer3"));
-      // Layer4 = addLayerToMap(url4, style4, (feature, layer) => onEachFeature(feature, layer, hstyle4, "Layer4"));
+      fetch(url7)
+        .then(response => response.json())
+        .then(data => {
+          const geoJson = {
+            "type": "FeatureCollection",
+            "features": data.results.map(result => result.geo_shape)
+          };
+          Layer6 = L.geoJSON(geoJson, { style: style6 }).addTo(map);
+        })
+      Layer3 = await matchParcels(url3, url6, style3, (feature, layer) => onEachFeature(feature, layer, hstyle3, "Layer3"))
       break;
 
     default:
@@ -272,7 +290,7 @@ function addLayerToMap(url, style, onEachFeature) {
 
 Layer1 = L.geoJSON.ajax(`https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/departements.geojson`, {
   style: style1,
-  onEachFeature: function (feature, layer, style, layerSource) {
+  onEachFeature: function (feature, layer) {
     onEachFeature(feature, layer, hstyle1, "Layer1");
   }
 }).addTo(map);
