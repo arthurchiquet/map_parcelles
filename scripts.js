@@ -1,4 +1,4 @@
-var map = L.map('map', { zoomControl: false });
+var map = L.map('map', { zoomControl: false, renderer: L.canvas() });
 map.getContainer().style.backgroundColor = 'white'
 var corners = [
   [
@@ -40,7 +40,6 @@ map.fitBounds(corners);
 
 var info = L.control();
 const clickedFeature = document.getElementById("feature")
-console.log(clickedFeature)
 
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info');
