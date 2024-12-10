@@ -1,9 +1,12 @@
+body {
+  margin: 0
+}
 
- #map {
-   height: 100vh;
- }
+#map {
+  height: 100vh;
+}
 
- #feature {
+#feature {
   font-family: "Roboto Mono", monospace !important;
   text-transform: uppercase;
   font-weight: 700;
@@ -14,44 +17,44 @@
   bottom: 1.5em;
   left: 50%;
   transform: translate(-50%, -50%);
- }
+}
 
- .info {
-   font-family: "Roboto Mono", monospace !important;
-   padding: 5px;
-   text-transform: uppercase;
-   background: white;
-   background: rgba(255, 255, 255, 0.8);
-   border: 1px solid black;
-   border-radius: 5px;
- }
+.info {
+  font-family: "Roboto Mono", monospace !important;
+  padding: 5px;
+  text-transform: uppercase;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid black;
+  border-radius: 5px;
+}
 
- .info h4 {
-   font-size: 14px;
-   color: #047857;
-   margin: 0 0 10px;
- }
+.info h4 {
+  font-size: 14px;
+  color: #047857;
+  margin: 0 0 10px;
+}
 
- .info p {
-   margin: 0 0 5px;
- }
+.info p {
+  margin: 0 0 5px;
+}
 
- .tooltip {
-   font-family: "Roboto Mono", monospace !important;
-   background: none;
-   box-shadow: none;
-   font-weight: 700;
-   border: none;
-   text-transform: uppercase;
-   font-size: 9px;
- }
+.tooltip {
+  font-family: "Roboto Mono", monospace !important;
+  background: none;
+  box-shadow: none;
+  font-weight: 700;
+  border: none;
+  text-transform: uppercase;
+  font-size: 9px;
+}
 
- .custom-text-icon {
-   font-family: "Roboto Mono", monospace !important;
-   background-color: white;
- }
+.custom-text-icon {
+  font-family: "Roboto Mono", monospace !important;
+  background-color: white;
+}
 
- .leaflet-interactive,
- .leaflet-container {
-   cursor: crosshair !important;
- }
+.leaflet-interactive,
+.leaflet-container {
+  cursor: crosshair !important;
+}
