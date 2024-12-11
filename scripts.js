@@ -118,11 +118,53 @@ function createLabel(e) {
 
 }
 
-function updateFeature(e) {
+function updateFeature(e, layerSource) {
   if (e.target.feature.properties.nom) {
-    clickedFeature.innerHTML = e.target.feature.properties.nom
+    // Commencer à construire le contenu HTML
+    clickedFeature.innerHTML = `
+      <h4>${e.target.feature.properties.nom}</h4>
+    `;
+
+    if (layerSource === "Layer3") {
+      const button = document.createElement("a");
+      button.textContent = "+ informations";
+      button.href = "#";
+      button.style.display = "block";
+
+      clickedFeature.appendChild(button);
+
+      const modal = document.getElementById('modal');
+      const modalContent = document.getElementById('modal-content');
+
+      button.addEventListener('click', () => {
+        fetch(`https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/exploitations/${e.target.feature.properties.nom}.json`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+            modalContent.innerHTML = `
+              <h3>${data.Nom}</H3>
+              <p>${data.Type}</p>
+              <p>${data.Description}</p>
+              <p>${data.Adresse}</p>
+              <p>${data.T\u00e9l\u00e9phone}</p>
+            `
+          })
+        modal.style.display = 'flex';
+      });
+
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    }
+
+    clickedFeature.style.textAlign = "center";
+    clickedFeature.style.padding = "5px";
   }
 }
+
+
 
 function highlightLayer(e, style, layerSource) {
   var layer = e.target;
@@ -207,7 +249,7 @@ async function matchParcels(url3, url4, style, onEachFeature) {
 
 async function clickAction(e, layerSource) {
   const layer = e.target
-  updateFeature(e)
+  updateFeature(e, layerSource)
 
   switch (layerSource) {
     case 'Layer1':
