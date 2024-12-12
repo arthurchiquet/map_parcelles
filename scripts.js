@@ -23,19 +23,6 @@ var corners = [
   ]
 ]
 
-var polygon = L.polygon(corners, {
-  "color": "black",
-  "fillOpacity": 0,
-  "weight": 1,
-}).addTo(map);
-
-var textIcon = L.divIcon({
-  className: 'custom-text-icon',
-  html: '<b>LA CHAMPAGNE</b>',
-  iconSize: [100, 0],
-  iconAnchor: [-4, 0]
-});
-
 map.fitBounds(corners);
 
 var info = L.control();
@@ -63,17 +50,15 @@ info.update = function (properties) {
 
 info.addTo(map);
 
-var marker = L.marker([50.3, 1.5], { icon: textIcon }).addTo(map);
-
-const style1 = { color: "black", weight: 1, fillOpacity: 0 };
-const style2 = { color: "black", weight: 0.6, fillOpacity: 0 };
-const style3 = { color: "black", weight: 0.1, fillOpacity: 0 };
-const style4 = { color: "black", fillColor: "#bf9000", weight: 0.2, opacity: 1, fillOpacity: 0.8 };
-const style5 = { color: "black", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
+const style1 = { color: "#262626", weight: 1, fillOpacity: 0 };
+const style2 = { color: "#262626", weight: 0.6, fillOpacity: 0 };
+const style3 = { color: "#262626", weight: 0.1, fillOpacity: 0 };
+const style4 = { color: "#262626", fillColor: "#bf9000", weight: 0.2, opacity: 1, fillOpacity: 0.8 };
+const style5 = { color: "#262626", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
 const style6 = { color: "#075985", weight: 1.5, fillOpacity: 0.5 };
 
-const hstyle1 = { weight: 2, fillColor: "#22c55e", fillOpacity: 0.1, zoom: 50 };
-const hstyle2 = { color: "black", weight: 2, fillOpacity: 0.2 };
+const hstyle1 = { weight: 3 };
+const hstyle2 = { weight: 2 };
 const hstyle3 = { weight: 2 };
 
 var Layer1 = null;
@@ -82,6 +67,7 @@ var Layer3 = null;
 var Layer4 = null;
 var Layer5 = null;
 var Layer6 = null;
+labelMarker = null
 
 function getColor(c) {
   return c === "MEUNIER N" ? '#8b5cf6' :
@@ -120,7 +106,6 @@ function createLabel(e) {
 
 function updateFeature(e, layerSource) {
   if (e.target.feature.properties.nom) {
-    // Commencer à construire le contenu HTML
     clickedFeature.innerHTML = `
       <h4>${e.target.feature.properties.nom}</h4>
     `;
@@ -170,7 +155,6 @@ function highlightLayer(e, style, layerSource) {
   var layer = e.target;
   layer.setStyle(style);
   createLabel(e);
-
   if (layerSource === "Layer3") {
     info.update(layer.feature.properties);
   }
@@ -316,11 +300,18 @@ async function clickAction(e, layerSource) {
 
 function onEachFeature(feature, layer, style, layerSource) {
   layer.on({
-    mouseover: function (e) { highlightLayer(e, style, layerSource); },
-    mouseout: function (e) { resetHighlightLayer(e, layerSource); },
-    click: function (e) { clickAction(e, layerSource); }
+    mouseover: function (e) {
+      highlightLayer(e, style, layerSource);
+    },
+    mouseout: function (e) {
+      resetHighlightLayer(e, layerSource);
+    },
+    click: function (e) {
+      clickAction(e, layerSource);
+    }
   });
 }
+
 
 function addLayerToMap(url, style, onEachFeature) {
   return L.geoJSON.ajax(url, {
