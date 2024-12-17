@@ -1,4 +1,4 @@
-var map = L.map('map', { zoomControl: false, renderer: L.canvas() });
+var map = L.map('map', { zoomControl: false, preferCanvas: true });
 map.getContainer().style.backgroundColor = 'white'
 var corners = [
   [
@@ -54,7 +54,7 @@ const style1 = { color: "#262626", weight: 1, fillOpacity: 0 };
 const style2 = { color: "#262626", weight: 0.6, fillOpacity: 0 };
 const style3 = { color: "#262626", weight: 0.1, fillOpacity: 0 };
 const style4 = { color: "#262626", fillColor: "#bf9000", weight: 0.2, opacity: 1, fillOpacity: 0.8 };
-const style5 = { color: "#262626", fillColor: "#f59e0b", weight: 1.5, fillOpacity: 0.1 };
+const style5 = { color: "#262626", fillColor: "#a3e635", weight: 1.5, fillOpacity: 0.2 };
 const style6 = { color: "#075985", weight: 1.5, fillOpacity: 0.5 };
 
 const hstyle1 = { weight: 3 };
@@ -237,7 +237,6 @@ async function clickAction(e, layerSource) {
 
   switch (layerSource) {
     case 'Layer1':
-      map.fitBounds(e.target.getBounds());
 
       if (Layer3) {
         map.removeLayer(Layer3);
@@ -255,7 +254,7 @@ async function clickAction(e, layerSource) {
         map.removeLayer(Layer2);
       }
       const url2 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/communes/${layer.feature.properties.code}.geojson`;
-      Layer2 = addLayerToMap(url2, style2, (feature, layer) => onEachFeature(feature, layer, hstyle2, "Layer2"));
+      Layer2 = addLayerToMap(url2, style2, true, (feature, layer) => onEachFeature(feature, layer, hstyle2, "Layer2"));
       break;
 
     case 'Layer2':
@@ -278,8 +277,8 @@ async function clickAction(e, layerSource) {
       const url5 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/communes/aoc/${layer.feature.properties.id}.geojson`
       const url6 = `https://raw.githubusercontent.com/arthurchiquet/data/refs/heads/master/parcelles/${layer.feature.properties.id}.json`
       const url7 = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/hydrographie-surfaces-deau/records?select=geo_shape&limit=50&refine=code_insee%3A${layer.feature.properties.id}`
-      Layer4 = addLayerToMap(url4, style4, (feature, layer) => { }).bringToBack();
-      Layer5 = addLayerToMap(url5, style5, (feature, layer) => { }).bringToBack();
+      Layer4 = addLayerToMap(url4, style4, false, (feature, layer) => { }).bringToBack();
+      Layer5 = addLayerToMap(url5, style5, false, (feature, layer) => { }).bringToBack();
       fetch(url7)
         .then(response => response.json())
         .then(data => {
@@ -313,11 +312,19 @@ function onEachFeature(feature, layer, style, layerSource) {
 }
 
 
-function addLayerToMap(url, style, onEachFeature) {
-  return L.geoJSON.ajax(url, {
+function addLayerToMap(url, style, fit, onEachFeature) {
+  const layer = L.geoJSON.ajax(url, {
     style: style,
     onEachFeature: onEachFeature
   }).addTo(map);
+
+  if (fit) {
+    layer.on('data:loaded', function () {
+      const bounds = layer.getBounds();
+      map.fitBounds(bounds);
+    });
+  }
+  return layer;
 }
 
 
@@ -327,3 +334,4 @@ Layer1 = L.geoJSON.ajax(`https://raw.githubusercontent.com/arthurchiquet/data/re
     onEachFeature(feature, layer, hstyle1, "Layer1");
   }
 }).addTo(map);
+

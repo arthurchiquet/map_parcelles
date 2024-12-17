@@ -1,5 +1,5 @@
 body {
-  margin: 0
+  margin: 0;
 }
 
 #map {
@@ -60,16 +60,6 @@ body {
   text-transform: uppercase;
   font-size: 10px;
   padding: 0
-}
-
-.custom-text-icon {
-  font-family: "Roboto Mono", monospace !important;
-  background-color: white;
-}
-
-.leaflet-interactive,
-.leaflet-container {
-  cursor: crosshair !important;
 }
 
 .modal {
